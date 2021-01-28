@@ -2,27 +2,6 @@ Post processes output from RNA-Seq alignments.  Has been used on salmon 'quant.s
 but may generalize to other outputs soon.
 
 
-## Example
-``` r
-post_process_rnaseq_align(
-  this_script_path = housekeeping::get_script_dir_path(include_file_name = T),
-  input_file_paths = <input_file_paths>,
-  output_dir = <output_dir>,
-  ref = "grch38",
-  gene_biotypes = c('protein_coding', 
-                    'IG_C_gene','IG_D_gene', 'IG_J_gene', 'IG_V_gene',
-                    'TR_C_gene', 'TR_D_gene', 'TR_J_gene','TR_V_gene'),
-  thread_num = 8,
-  output_transcript_matrix = F,
-  output_hgnc_matrix = T,
-  output_entrez_id_matrix = F,
-  output_piped_hugo_entrez_id_matrix = F,
-  output_upper_quartile_norm = F,
-  output_log2_upper_quartile_norm = F,
-  counts_or_tpm = "counts"
-)
-```
-
 
 ## Install
 Restart R
@@ -33,7 +12,7 @@ devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign")
 
 Or for a specific version:
 ``` r
-devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign", ref = "0.2-02")
+devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign", ref = "0.3.01")
 ```
 
 ## Previous locations
@@ -90,3 +69,25 @@ See inst/mapping_genes.R for the addition of another 1882 genes using Annotation
 * Add more feedback on making the final matrices.
 * Combine transcript counts using lapply or mclapply to do it more quickly.
 * Sort the entrez id's numerically
+
+
+## Example
+``` r
+post_process_rnaseq_align(
+  this_script_path = housekeeping::get_script_dir_path(include_file_name = T),
+  input_file_paths = <input_file_paths>,
+  output_dir = <output_dir>,
+  ref = "grch38",
+  gene_biotypes = c('protein_coding', 
+                    'IG_C_gene','IG_D_gene', 'IG_J_gene', 'IG_V_gene',
+                    'TR_C_gene', 'TR_D_gene', 'TR_J_gene','TR_V_gene'),
+  thread_num = 8,
+  output_transcript_matrix = F,
+  output_hgnc_matrix = T,
+  output_entrez_id_matrix = F,
+  output_piped_hugo_entrez_id_matrix = F,
+  output_upper_quartile_norm = F,
+  output_log2_upper_quartile_norm = F,
+  counts_or_tpm = "counts"
+)
+```
