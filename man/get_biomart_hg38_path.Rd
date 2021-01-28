@@ -21,7 +21,8 @@ get_biomart_hg38_path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 \seealso{
-Other mart: \code{\link{get_biomart_grch38_path}},
-  \code{\link{post_process_salmon}}
+Other mart: 
+\code{\link{get_biomart_grch38_path}()},
+\code{\link{post_process_rnaseq_align}()}
 }
 \concept{mart}

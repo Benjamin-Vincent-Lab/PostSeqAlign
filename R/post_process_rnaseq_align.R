@@ -92,7 +92,7 @@ post_process_rnaseq_align = function(
   output_paths = c()
   
   # add the sample names
-  dat = data.frame(Sample_ID = names(read_data), dat)
+  dat = data.frame(Run_ID = names(read_data), dat)
   row.names(dat) = NULL
   
   if (ref == 'grch38'){
@@ -214,7 +214,7 @@ post_process_rnaseq_align = function(
   
   BM_results = tidyr::unite(BM_results, combined_names, fin_symbols, fin_ids, sep = "|", remove = FALSE)
   # drop dat columns that aren't in BM_results
-  dat = dat[, c("Sample_ID", names(dat)[names(dat) %in% BM_results$transcript])] # went from 190K to 130K probably from loosing gene biotypes
+  dat = dat[, c("Run_ID", names(dat)[names(dat) %in% BM_results$transcript])] # went from 190K to 130K probably from loosing gene biotypes
   
   make_matrix_of_cols = c()
   if(output_hgnc_matrix) make_matrix_of_cols = c(make_matrix_of_cols, "fin_symbols")

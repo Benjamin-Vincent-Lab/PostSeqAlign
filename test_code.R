@@ -48,7 +48,7 @@ names(input_file_paths) = sample_names
 # counts_or_tpm = "counts"
 
 
-StarSalmon::post_process_salmon(
+StarSalmon::post_process_rnaseq_align(
   this_script_path = housekeeping::get_script_dir_path(include_file_name = T),
   input_file_paths = input_file_paths,
   output_dir = output_dir,
@@ -150,7 +150,7 @@ length(unique(BM_results$fin_ids)) #18397
 
 
 
-post_process_salmon(
+post_process_rnaseq_align(
   this_script_path = housekeeping::get_script_dir_path(include_file_name = T),
   input_file_paths = input_file_paths,# = system(paste0("ls ", RAW_DATA_DIR, "/pipeline_output/star_salmon/*/*_quant.sf"), intern = TRUE)
   output_dir = output_dir,# = file.path(base_dir, "post_processing", "star_salmon")
