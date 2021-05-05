@@ -11,6 +11,7 @@ post_process_rnaseq_align(
   ref = "grch38",
   gene_biotypes = c("protein_coding", "from AnnotationDbi", "IG_C_gene", "IG_D_gene",
     "IG_J_gene", "IG_V_gene", "TR_C_gene", "TR_D_gene", "TR_J_gene", "TR_V_gene"),
+  file_prefix = "",
   output_transcript_matrix = TRUE,
   output_hgnc_matrix = TRUE,
   output_entrez_id_matrix = FALSE,
@@ -30,6 +31,8 @@ post_process_rnaseq_align(
 \item{ref}{options 'grch38' with ensemble output or 'hg38' with ucsc output}
 
 \item{gene_biotypes}{The type of biomaRt gene_biotypes that should be output to the gene level output.}
+
+\item{file_prefix}{Output files will have this prefix string appended to them}
 
 \item{output_transcript_matrix}{T/F}
 

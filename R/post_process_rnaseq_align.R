@@ -34,7 +34,7 @@ post_process_rnaseq_align = function(
   gene_biotypes = c('protein_coding', 'from AnnotationDbi',
                     'IG_C_gene','IG_D_gene', 'IG_J_gene', 'IG_V_gene',
                     'TR_C_gene', 'TR_D_gene', 'TR_J_gene','TR_V_gene'),
-  file_prefix = ""
+  file_prefix = "",
   output_transcript_matrix = TRUE,
   output_hgnc_matrix = TRUE,
   output_entrez_id_matrix = FALSE,
@@ -238,7 +238,7 @@ post_process_rnaseq_align = function(
       stop("Unknown make_matrix_of_col")
     }
     
-    this_file_prefix = paste0(file_prefix, this_file_prefix}
+    this_file_prefix = paste0(file_prefix, this_file_prefix)
     my_genes = sort(unique(BM_results[[make_matrix_of_col]]))
     my_genes = my_genes[my_genes != ""]
     
