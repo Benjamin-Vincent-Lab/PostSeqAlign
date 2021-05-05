@@ -11,6 +11,7 @@
 #' @param input_file_paths Named character vector of paths to the pipeline output data. Samples will be named by the names of the vector. If not named thye will be named after the quant file.
 #' @param output_dir Path to the output folder.
 #' @param gene_biotypes The type of biomaRt gene_biotypes that should be output to the gene level output.
+#' @param file_prefix Output files will have this prefix string appended to them
 #' @param output_entrez_id_matrix T/F
 #' @param output_hgnc_matrix T/F
 #' @param output_log2_upper_quartile_norm T/F
@@ -33,6 +34,7 @@ post_process_rnaseq_align = function(
   gene_biotypes = c('protein_coding', 'from AnnotationDbi',
                     'IG_C_gene','IG_D_gene', 'IG_J_gene', 'IG_V_gene',
                     'TR_C_gene', 'TR_D_gene', 'TR_J_gene','TR_V_gene'),
+  file_prefix = ""
   output_transcript_matrix = TRUE,
   output_hgnc_matrix = TRUE,
   output_entrez_id_matrix = FALSE,
@@ -48,7 +50,9 @@ post_process_rnaseq_align = function(
   
   dir.create(output_dir, showWarnings = F)
   
-  readme_path = file.path(output_dir, "readme.txt")
+  if(file_prefix != ""){file_prefix %<>% paste0("__")}
+  
+  readme_path = file.path(output_dir, paste0(file_prefix,"readme.txt"))
   if(file.exists(readme_path)){ file.remove(readme_path)}
   
   a = function(...){
@@ -225,14 +229,16 @@ post_process_rnaseq_align = function(
     BM_results[[make_matrix_of_col]][is.na(BM_results[[make_matrix_of_col]])] = ""
     my_dt = dat[,1, drop = FALSE]
     if(make_matrix_of_col == "fin_symbols"){
-      file_prefix = "hgnc_"
+      this_file_prefix = "hgnc_"
     } else if (make_matrix_of_col == "fin_ids"){
-      file_prefix = "entrez_"
+      this_file_prefix = "entrez_"
     } else if (make_matrix_of_col == "combined_names"){
-      file_prefix = "hgnc_entrez_"
+      this_file_prefix = "hgnc_entrez_"
     } else {
       stop("Unknown make_matrix_of_col")
     }
+    
+    this_file_prefix = paste0(file_prefix, this_file_prefix}
     my_genes = sort(unique(BM_results[[make_matrix_of_col]]))
     my_genes = my_genes[my_genes != ""]
     
@@ -280,20 +286,20 @@ post_process_rnaseq_align = function(
     # my_dt3 = data.frame(my_dt,my_ret2)
     # paste0("mclapply: ", difftime(Sys.time(), start_time, units = "secs"))
     
-    my_unnorm_path = file.path(output_dir, paste0(file_prefix, counts_or_tpm,".tsv"))
+    my_unnorm_path = file.path(output_dir, paste0(this_file_prefix, counts_or_tpm,".tsv"))
     output_paths = c(output_paths, my_unnorm_path)
     fwrite(my_dt, my_unnorm_path, sep = "\t")
     
     if(output_upper_quartile_norm || output_log2_upper_quartile_norm){
       norm_dat = binfotron::normalize_rows_by_quartile(data.table(my_dt))
       if(output_upper_quartile_norm) {
-        norm_path = file.path(output_dir, paste0(file_prefix, "norm_",counts_or_tpm,".tsv"))
+        norm_path = file.path(output_dir, paste0(this_file_prefix, "norm_",counts_or_tpm,".tsv"))
         output_paths = c(output_paths, norm_path)
         fwrite(norm_dat,  norm_path, sep = "\t")
       }
       if(output_log2_upper_quartile_norm){
         log2_norm_dat = binfotron::log_transform_plus(norm_dat)
-        log2_path = file.path(output_dir, paste0(file_prefix, "log2_norm_",counts_or_tpm,".tsv"))
+        log2_path = file.path(output_dir, paste0(this_file_prefix, "log2_norm_",counts_or_tpm,".tsv"))
         output_paths = c(output_paths, log2_path)
         
         fwrite(log2_norm_dat,  log2_path, sep = "\t")
