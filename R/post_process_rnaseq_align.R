@@ -110,7 +110,7 @@ post_process_rnaseq_align = function(
     # if (ref == 'grch38'){
     #   isoform_output_path = file.path(output_dir, paste0(file_prefix, ref, "_transcript_", counts_or_tpm,".tsv"))
     # } else if (ref == 'hg38') {
-    isoform_output_path = file.path(output_dir, paste0(file_prefix, "transcript_", counts_or_tpm,".tsv"))
+    isoform_output_path = file.path(output_dir, paste0(file_prefix, "trans_", counts_or_tpm,".tsv"))
     # }
     
     fwrite(dat, isoform_output_path, sep = "\t")
@@ -118,12 +118,12 @@ post_process_rnaseq_align = function(
     
     if(output_upper_quartile_norm || output_log2_upper_quartile_norm){
       norm_dat = binfotron::normalize_rows_by_quartile(data.table(dat))
-      output_upper_quartile_norm_path = file.path(output_dir, paste0(file_prefix, "norm_transcript_", counts_or_tpm,".tsv"))
+      output_upper_quartile_norm_path = file.path(output_dir, paste0(file_prefix, "trans_", counts_or_tpm,"_norm.tsv"))
       output_paths = c(output_paths, output_upper_quartile_norm_path)
       fwrite(norm_dat, output_upper_quartile_norm_path, sep = "\t")
       if(output_log2_upper_quartile_norm){
         log2_norm_dat = binfotron::log_transform_plus(norm_dat)
-        output_log2_upper_quartile_norm_path = file.path(output_dir, paste0(file_prefix, "log2_norm_transcript_", counts_or_tpm,".tsv"))
+        output_log2_upper_quartile_norm_path = file.path(output_dir, paste0(file_prefix, "trans_", counts_or_tpm,"_norm_log2.tsv"))
         output_paths = c(output_paths, output_log2_upper_quartile_norm_path)
         fwrite(log2_norm_dat,  output_log2_upper_quartile_norm_path, sep = "\t")
       }
