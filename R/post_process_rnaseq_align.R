@@ -107,11 +107,11 @@ post_process_rnaseq_align = function(
   
   if(output_transcript_matrix){
     
-    if (ref == 'grch38'){
-      isoform_output_path = file.path(output_dir, paste0(file_prefix, "grch38_transcript_", counts_or_tpm,".tsv"))
-    } else if (ref == 'hg38') {
-      isoform_output_path = file.path(output_dir, paste0(file_prefix, "hg38_transcript_", counts_or_tpm,".tsv"))
-    }
+    # if (ref == 'grch38'){
+    #   isoform_output_path = file.path(output_dir, paste0(file_prefix, ref, "_transcript_", counts_or_tpm,".tsv"))
+    # } else if (ref == 'hg38') {
+    isoform_output_path = file.path(output_dir, paste0(file_prefix, "transcript_", counts_or_tpm,".tsv"))
+    # }
     
     fwrite(dat, isoform_output_path, sep = "\t")
     output_paths = c(output_paths, isoform_output_path)
