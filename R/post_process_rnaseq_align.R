@@ -293,13 +293,13 @@ post_process_rnaseq_align = function(
     if(output_upper_quartile_norm || output_log2_upper_quartile_norm){
       norm_dat = binfotron::normalize_rows_by_quartile(data.table(my_dt))
       if(output_upper_quartile_norm) {
-        norm_path = file.path(output_dir, paste0(this_file_prefix, "norm_",counts_or_tpm,".tsv"))
+        norm_path = file.path(output_dir, paste0(this_file_prefix, "_",counts_or_tpm,"_norm.tsv"))
         output_paths = c(output_paths, norm_path)
         fwrite(norm_dat,  norm_path, sep = "\t")
       }
       if(output_log2_upper_quartile_norm){
         log2_norm_dat = binfotron::log_transform_plus(norm_dat)
-        log2_path = file.path(output_dir, paste0(this_file_prefix, "log2_norm_",counts_or_tpm,".tsv"))
+        log2_path = file.path(output_dir, paste0(this_file_prefix, "_",counts_or_tpm,"_norm_log2.tsv"))
         output_paths = c(output_paths, log2_path)
         
         fwrite(log2_norm_dat,  log2_path, sep = "\t")
