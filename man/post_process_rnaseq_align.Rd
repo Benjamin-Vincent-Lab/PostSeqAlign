@@ -18,11 +18,12 @@ post_process_rnaseq_align(
   output_piped_hugo_entrez_id_matrix = FALSE,
   output_upper_quartile_norm = TRUE,
   output_log2_upper_quartile_norm = TRUE,
-  counts_or_tpm = "counts"
+  counts_or_tpm = "counts",
+  sample_key = "Run_ID"
 )
 }
 \arguments{
-\item{this_script_path}{Path to script that runs this function for documentation urposes}
+\item{this_script_path}{Path to script that runs this function for documentation purposes}
 
 \item{input_file_paths}{Named character vector of paths to the pipeline output data. Samples will be named by the names of the vector. If not named thye will be named after the quant file.}
 
@@ -47,6 +48,8 @@ post_process_rnaseq_align(
 \item{output_log2_upper_quartile_norm}{T/F}
 
 \item{counts_or_tpm}{'counts' or 'tpm'}
+
+\item{sample_key}{String to name the sample identifier column.}
 }
 \value{
 A vector of paths to the files.

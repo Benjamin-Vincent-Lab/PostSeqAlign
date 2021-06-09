@@ -20,7 +20,8 @@
 #' @param output_upper_quartile_norm T/F
 #' @param counts_or_tpm 'counts' or 'tpm'
 #' @param ref options 'grch38' with ensemble output or 'hg38' with ucsc output
-#' @param this_script_path Path to script that runs this function for documentation urposes
+#' @param this_script_path Path to script that runs this function for documentation purposes
+#' @param sample_key String to name the sample identifier column.
 #' @return A vector of paths to the files.
 #' 
 #' @family mart
@@ -41,7 +42,8 @@ post_process_rnaseq_align = function(
   output_piped_hugo_entrez_id_matrix = FALSE,
   output_upper_quartile_norm = TRUE,
   output_log2_upper_quartile_norm = TRUE,
-  counts_or_tpm = "counts"
+  counts_or_tpm = "counts",
+  sample_key = "Run_ID"
 ){
   library(binfotron)
   library(magrittr)
@@ -97,6 +99,8 @@ post_process_rnaseq_align = function(
   
   # add the sample names
   dat = data.frame(Run_ID = names(read_data), dat)
+  if (sample_key != "Run_ID") names(dat)[names(dat) == "Run_ID"] = sample_key
+  
   row.names(dat) = NULL
   
   if (ref == 'grch38'){
@@ -218,7 +222,7 @@ post_process_rnaseq_align = function(
   
   BM_results = tidyr::unite(BM_results, combined_names, fin_symbols, fin_ids, sep = "|", remove = FALSE)
   # drop dat columns that aren't in BM_results
-  dat = dat[, c("Run_ID", names(dat)[names(dat) %in% BM_results$transcript])] # went from 190K to 130K probably from loosing gene biotypes
+  dat = dat[, c(sample_key, names(dat)[names(dat) %in% BM_results$transcript])] # went from 190K to 130K probably from loosing gene biotypes
   
   make_matrix_of_cols = c()
   if(output_hgnc_matrix) make_matrix_of_cols = c(make_matrix_of_cols, "fin_symbols")
