@@ -139,10 +139,9 @@ post_process_rnaseq_align = function(
   a("")
   a("Using saved biomaRt.")
   if (ref == 'grch38'){
-    BM_results = data.table::fread(StarSalmon::get_biomart_grch38_path(), data.table = FALSE)
-    # BM_results = data.table::fread("/rstudio-common/dbortone/packages/StarSalmon/inst/biomart/grch38/bm_result.tsv", data.table = FALSE)
+    BM_results = data.table::fread(PostRNASeqAlign::get_biomart_grch38_path(), data.table = FALSE)
   } else if (ref == 'hg38') {
-    BM_results = data.table::fread(StarSalmon::get_biomart_hg38_path(), data.table = FALSE)
+    BM_results = data.table::fread(PostRNASeqAlign::get_biomart_hg38_path(), data.table = FALSE)
   } else {
     stop(paste0("Unrecognized ref: ", ref,".  Please use either 'grch38' or 'hg38'."))
   }
