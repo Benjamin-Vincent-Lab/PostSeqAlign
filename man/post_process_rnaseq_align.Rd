@@ -18,6 +18,7 @@ post_process_rnaseq_align(
   output_piped_hugo_entrez_id_matrix = FALSE,
   output_upper_quartile_norm = TRUE,
   output_log2_upper_quartile_norm = TRUE,
+  output_conversion_table = TRUE,
   counts_or_tpm = "counts",
   sample_key = "Run_ID"
 )

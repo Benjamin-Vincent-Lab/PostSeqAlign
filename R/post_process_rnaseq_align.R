@@ -42,6 +42,7 @@ post_process_rnaseq_align = function(
   output_piped_hugo_entrez_id_matrix = FALSE,
   output_upper_quartile_norm = TRUE,
   output_log2_upper_quartile_norm = TRUE,
+  output_conversion_table = TRUE,
   counts_or_tpm = "counts",
   sample_key = "Run_ID"
 ){
@@ -227,7 +228,7 @@ post_process_rnaseq_align = function(
   if(output_hgnc_matrix) make_matrix_of_cols = c(make_matrix_of_cols, "fin_symbols")
   if(output_entrez_id_matrix) make_matrix_of_cols = c(make_matrix_of_cols, "fin_ids")
   if(output_piped_hugo_entrez_id_matrix) make_matrix_of_cols = c(make_matrix_of_cols, "combined_names")
-  
+  if(output_conversion_table) fwrite(BM_results,  file.path(output_dir, paste0("conversion_table.tsv")), sep = "\t")
   for(make_matrix_of_col in make_matrix_of_cols){
     BM_results[[make_matrix_of_col]][is.na(BM_results[[make_matrix_of_col]])] = ""
     my_dt = dat[,1, drop = FALSE]
@@ -259,35 +260,6 @@ post_process_rnaseq_align = function(
         my_dt[[my_gene]] = apply(dat[,my_transcripts],1,function(x){sum(x, na.rm = TRUE)})
       }
     }
-    # paste0("for: ", difftime(Sys.time(), start_time, units = "secs"))
-    # 
-    # start_time = Sys.time()
-    # my_ret = lapply(my_genes[my_range], function(my_gene){
-    #   #message(my_gene)
-    #   my_transcripts = unique(BM_results$transcript[BM_results[[make_matrix_of_col]] == my_gene])
-    #   if(length(my_transcripts) == 1){
-    #     return(dat[[my_transcripts]])
-    #   } else if(length(my_transcripts) > 1){
-    #     return(apply(dat[,my_transcripts],1,function(x){sum(x)}))
-    #   }
-    # })
-    # names(my_ret) = my_genes[my_range]
-    # my_dt2 = data.frame(my_dt,my_ret)
-    # paste0("lapply: ", difftime(Sys.time(), start_time, units = "secs"))
-    # 
-    # start_time = Sys.time()
-    # my_ret2 = mclapply(my_genes[my_range], function(my_gene){
-    #   #message(my_gene)
-    #   my_transcripts = unique(BM_results$transcript[BM_results[[make_matrix_of_col]] == my_gene])
-    #   if(length(my_transcripts) == 1){
-    #     return(dat[[my_transcripts]])
-    #   } else if(length(my_transcripts) > 1){
-    #     return(apply(dat[,my_transcripts],1,function(x){sum(x, na.rm = TRUE)}))
-    #   }
-    # }, mc.cores = 8)
-    # names(my_ret2) = my_genes[my_range]
-    # my_dt3 = data.frame(my_dt,my_ret2)
-    # paste0("mclapply: ", difftime(Sys.time(), start_time, units = "secs"))
     
     my_unnorm_path = file.path(output_dir, paste0(this_file_prefix, counts_or_tpm,".tsv"))
     output_paths = c(output_paths, my_unnorm_path)
