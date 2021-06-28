@@ -18,7 +18,7 @@
 #' @return A vector of paths to the output file.
 #' 
 #' @export
-quantsf_to_matrix = function(
+ensembl_counts_to_rkpm = function(
   lengths_table_path = get_human_ensembl_to_hgnc_entrez_path(),
   file_prefix = "",
   input_file_path,
