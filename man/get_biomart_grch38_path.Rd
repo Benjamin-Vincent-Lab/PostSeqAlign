@@ -13,7 +13,7 @@ get_biomart_grch38_path()
 A path to the rds file.
 }
 \description{
-Returns the path a saved mart
+Returns the path to a saved mart
 }
 \details{
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

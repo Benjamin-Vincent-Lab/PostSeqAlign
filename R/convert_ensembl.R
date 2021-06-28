@@ -23,7 +23,7 @@
 #' 
 #' @export
 convert_ensembl = function(
-  conversion_table_path = get_human_ensembl_to_hgnc_entrez_path()
+  conversion_table_path = get_human_ensembl_to_hgnc_entrez_path(),
   convert_to_column = "hgnc_symbol",
   file_name = "converted_counts.tsv",
   gene_biotypes = NULL,

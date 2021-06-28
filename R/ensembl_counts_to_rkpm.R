@@ -19,7 +19,7 @@
 #' 
 #' @export
 quantsf_to_matrix = function(
-  lengths_table_path = get_human_ensembl_to_hgnc_entrez_path()
+  lengths_table_path = get_human_ensembl_to_hgnc_entrez_path(),
   file_prefix = "",
   input_file_path,
   output_dir,
