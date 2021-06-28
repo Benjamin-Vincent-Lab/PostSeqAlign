@@ -3,3 +3,6 @@
 inst/doc
 DSB_README.md
 test_code.R
+.config
+.local
+scratch
