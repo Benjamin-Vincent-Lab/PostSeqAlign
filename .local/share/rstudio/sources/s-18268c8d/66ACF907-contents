@@ -1,0 +1,5 @@
+mat<-matrix(1,ncol=3,nrow=2,TRUE)
+dev<-c(1,2,3)
+
+
+mat = t(t(mat) / dev)

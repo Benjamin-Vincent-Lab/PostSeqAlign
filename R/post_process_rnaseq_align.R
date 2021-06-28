@@ -46,6 +46,9 @@ post_process_rnaseq_align = function(
   counts_or_tpm = "counts",
   sample_key = "Run_ID"
 ){
+  message("******************************************************************")
+  message("post_process_rnaseq_align will be depricated soon in favor of using quantsf_to_matrix and convert_ensembl. These have more reliable gene mapping, are faster and don't duplicate the norm and log2 function that already exist in binfotron.")
+  message("******************************************************************")
   library(binfotron)
   library(magrittr)
   library(org.Hs.eg.db)
@@ -251,7 +254,7 @@ post_process_rnaseq_align = function(
     # start_time = Sys.time()
     # my_dt0 = my_dt
     for (my_gene in my_genes) {
-      # get the transcritps it matches to
+      # get the transcripts it matches to
       message(my_gene)
       my_transcripts = unique(BM_results$transcript[BM_results[[make_matrix_of_col]] == my_gene])
       if(length(my_transcripts) == 1){
