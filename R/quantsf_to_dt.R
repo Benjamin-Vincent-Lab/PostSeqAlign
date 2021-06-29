@@ -1,49 +1,47 @@
 
 #' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#' quantsf_to_matrix
+#' quantsf_to_dt
 #' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#' @title quantsf_to_matrix 
+#' @title quantsf_to_dt 
 #' 
 #' @description 
 #' Joins individual sample files into one tsv file.
 #' 
 #' @param counts_or_tpm 'counts' or 'tpm'
-#' @param file_prefix Output files will have this prefix string appended to them
 #' @param input_file_paths Named character vector of paths to the pipeline output data. Samples will be named by the names of the vector. If not named the will be named after the quant file.
-#' @param output_dir Path to the output folder.
+#' @param readme_path Optional path to which the comments will be appended.
 #' @param sample_key String to name the sample identifier column.
 #' @param this_script_path Path to script that runs this function for documentation purposes
 #' @return A vector of paths to the output file.
 #' 
 #' @export
-quantsf_to_matrix = function(
-  counts_or_tpm = "counts",
-  file_prefix = "",
+quantsf_to_dt = function(
   input_file_paths,# = system(paste0("ls ", RAW_DATA_DIR, "/pipeline_output/star_salmon/*/*_quant.sf"), intern = TRUE)
-  output_dir,# = file.path(base_dir, "post_processing", "star_salmon")
+  counts_or_tpm = "counts",
+  readme_path = NULL,
   sample_key = "Run_ID",
   this_script_path = ''
 ){
-  library(binfotron)
   library(magrittr)
   library(data.table)
   
-  dir.create(output_dir, showWarnings = F)
+  text_output = c()
   
-  if(file_prefix != ""){file_prefix %<>% paste0("__")}
-  
-  readme_path = file.path(output_dir, paste0(file_prefix,"readme.txt"))
-  if(file.exists(readme_path)){ file.remove(readme_path)}
+  if(!is.null(readme_path) && file.exists(readme_path)) file.remove(readme_path)
   
   a = function(...){
     my_output = paste0(...)
+    assign('text_output', c(text_output, my_output), env = parent.frame())
     if(!is.null(readme_path)){
       write(my_output, readme_path, append = TRUE)
     }
     cat(paste0(my_output,"\n"))
   }
   
-  a(paste0("## Making isoform counts matrix: ", this_script_path))
+  a("Running quantsf_to_dt")
+  if(!is.null(this_script_path)) a("script: ", this_script_path)
+  a("")
+  a(paste0("Assembling quant.sf ", counts_or_tpm, " into data.table."))
   a("")
   
   if(length(names(input_file_paths)) == 0){
@@ -51,7 +49,6 @@ quantsf_to_matrix = function(
   }
   
   
-  a("Reading in files from input_file_paths:")
   counts_or_tpm = tolower(counts_or_tpm)
   if(counts_or_tpm == "counts"){
     salmon_column = "NumReads"
@@ -59,8 +56,9 @@ quantsf_to_matrix = function(
     salmon_column = "TPM"
   }
   
+  a("Reading in files from input_file_paths:")
+  for(input_file_path in input_file_paths){a("  ", input_file_path)}
   read_data = lapply(input_file_paths, function(input_file_path){
-    a("  ", input_file_path)
     counts_df = fread(input_file_path, select = c("Name", salmon_column), data.table = F)
     return_list = lapply(counts_df[[salmon_column]], function(x)x) # rbindlist needs a list so we turn this into a list
     names(return_list) = counts_df[["Name"]] # Name the list items so they get assigned to the right column
@@ -72,22 +70,15 @@ quantsf_to_matrix = function(
   #   (ie, use.names = T won't assume the genes are in the same order)
   dat = rbindlist(read_data, use.names = TRUE, fill = TRUE)
   
-  
-  output_paths = c()
-  
   # add the sample names
-  dat = data.frame(Run_ID = names(read_data), dat)
+  dat = data.table(Run_ID = names(read_data), dat)
   if (sample_key != "Run_ID") names(dat)[names(dat) == "Run_ID"] = sample_key
   
   row.names(dat) = NULL
   
   # some grch38 references (eg GATK) put decimals at the end of the names. 
   names(dat)[2:ncol(dat)] %<>% substring(., 1, 15) 
+  attributes(dat)$comments = c(text_output, "") 
   
-  isoform_output_path = file.path(output_dir, paste0(file_prefix, "trans_", counts_or_tpm,".tsv"))
-  
-  fwrite(dat, isoform_output_path, sep = "\t")
-  output_paths = c(output_paths, isoform_output_path)
-  
-  return(output_paths)
+  return(dat)
 }

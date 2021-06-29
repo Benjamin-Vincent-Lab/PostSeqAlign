@@ -12,7 +12,7 @@ devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign")
 
 Or for a specific version:
 ``` r
-devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign", ref = "0.3.01")
+devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign", ref = "0.4-10")
 ```
 
 ## Previous locations
@@ -21,73 +21,62 @@ https://sc.unc.edu/dbortone/starsalmon
 https://sc.unc.edu/benjamin-vincent-lab/starsalmon
 Moved to github so that the package could be accessed without a token.
 
-## Creating BM_results
-The following code was used to make the grch38 bm_results
-``` r
-mart = useMart(biomart="ENSEMBL_MART_ENSEMBL",
-                  dataset="hsapiens_gene_ensembl", 
-                  host="useast.ensembl.org") # uk, useast, uswest, asia was intermitant, www was hardley ever working
-#https://useast.ensembl.org/info/website/archives/index.html
-# other hosts failed to find the data !@$!#$
-# failed submisions
-# failures mid submission
+## Replacing `post_process_rnaseq_align`
+`post_process_rnaseq_align` was a patchwork of mapping isoforms to genes using 
+biomaRt/AnnotationDbi and it still wasn't able to map all of the HGNC symbols 
+to ENSTs one-to-one. A new conversion table has been added (see repo 
+human_ensembl_to_hgnc_entrez v0.1-01). These new functions have been created to 
+take advantage of this table:
+* `get_human_ensembl_to_hgnc_entrez_path` - for accessing the conversion table
+* `quantsf_to_dt` - just takes counts or tpm from the quant.sf and puts them in a matrix
+* `convert_ensembl` - converts ENST's to ENSG, HGNC symobls or Entrez IDs
+* `ensembl_counts_to_rkpm` - converts Ensemble counts to RKPM
 
-# datasets <- biomaRt::listDatasets(ensembl)
-unique_names = my_dt[[1]]
-# my_filters = listFilters(mart)
-# my_attr = listAttributes(mart)
-# ucsc  |  UCSC Stable ID(s) [e.g. ENST00000000233.9] # these aren't ucsc!?!
-# had to run this a ton to get it to go all the way through.  was in the process of breaking it up into a loop when it ran through so I saved it.
-failed = FALSE
-BM_results = tryCatch({
-  biomaRt::getBM(
-    filters= "ucsc",
-    attributes= c("ucsc", "hgnc_symbol", "entrezgene_id", "gene_biotype"),
-    values= unique_names,
-    mart= mart
-  )
-}, warning = function(w) {
-  message("Got warning")
-  failed = TRUE
-}, error = function(e) {
-  message("Got error")
-  failed = TRUE
-})
-```
-I renamed the 'entrezgene_id' to 'entrezgene.' Connecting with the dataabse above was very problematic.  It failed to connect 1 out of 5 times and when it did connnect it didn't finish.  I was giving up on it and was going to write a loop to keep sending smaller batches using the try catch statement when finally the whole thing went through.  For future uses a loop is the way to go.  Also don't expect the column names to stay stable.  They change these on almost a monthly basis.  I'd love to switch to something other than biomaRt, but unfortunately AFAIK there isn't anything else.
+These smaller functions no-longer upper-quartile normalization or log2 transform 
+the data, but these transformations can be done using binfotron 
+(`log_transform_plus` & `normalize_rows_by_quartile`).
+
+Finally, using 8 threads, `convert_ensembl` is about 3x faster than 
+`post_process_rnaseq_align`.
+
+`post_process_rnaseq_align` will be kept around until it's phased out of our 
+workflows.
+
+## Recommendations
+* Avoid using RKPM unless you are doing it preparation for other module (eg TIDE).
+* It's better to stick with HGNC instead of Entrez IDs as HGNCs map one-to-one and the Entrez data have a lot of gaps.
+
+##ToDos
+Right now the `human_ensembl_to_hgnc_entrez` table was built using a GTF for 
+GRCh38/v103.  If a different GTF is used to map the reads then ideally a new 
+conversion table would be provided for those conversions.
 
 
-## Comments
-Using test_code.R, I checked if hgnc or entrez was better for not having one ensemble map to them.  Almost all of the duplicates for the ensembl id were from one ensembl id mapping to multiple entrez. Very few of the hgnc caused multimappings.  
-I also checked if using entrez to lookup hgnc and visa versa caused more multimappings.  It wasn't a huge contributor and looking up the genes did find a lot fo new genes:  ~70 for hgnc and ~300 for entrez.
-I skiped using tximport.  I don't see the value of this package, since I'd have to make the tx2gene matrix anyway. That's the hard part.
+## Example code
+``` R
+transcript_counts_dt = quantsf_to_dt(
+  input_file_paths = list.files("~/_tagged_batches/Gide_Cell_2019/rna_quant/all_v1", pattern = "*quant.sf", full.names = T)[1:5],
+  counts_or_tpm = "counts", # or tpm
+  readme_path = "~/scratch/test_readme.txt",
+  sample_key = "Run_ID",
+  this_script_path = housekeeping::get_script_dir_path(include_file_name = T)
+)
 
-See inst/mapping_genes.R for the addition of another 1882 genes using AnnotationDbi on 20200805.
-
-## ToDos
-* Could just merge this package into binfotron.
-* Add more feedback on making the final matrices.
-* Combine transcript counts using lapply or mclapply to do it more quickly.
-* Sort the entrez id's numerically
-
-
-## Example
-``` r
-post_process_rnaseq_align(
+hgnc_counts_dt = convert_ensembl(
+  transcript_counts_dt,
+  conversion_table_path = PostRNASeqAlign::get_human_ensembl_to_hgnc_entrez_path(),
+  convert_to_column = "hgnc_symbol", # gene_id, hgnc_symbol, entrez_id or hgnc_entrez
+  gene_biotypes = NULL, # eg: protein_coding
+  function_for_combining_counts = sum,
+  readme_path = "~/scratch/test_readme2.txt",
   this_script_path = housekeeping::get_script_dir_path(include_file_name = T),
-  input_file_paths = <input_file_paths>,
-  output_dir = <output_dir>,
-  ref = "grch38",
-  gene_biotypes = c('protein_coding', 
-                    'IG_C_gene','IG_D_gene', 'IG_J_gene', 'IG_V_gene',
-                    'TR_C_gene', 'TR_D_gene', 'TR_J_gene','TR_V_gene'),
-  thread_num = 8,
-  output_transcript_matrix = F,
-  output_hgnc_matrix = T,
-  output_entrez_id_matrix = F,
-  output_piped_hugo_entrez_id_matrix = F,
-  output_upper_quartile_norm = F,
-  output_log2_upper_quartile_norm = F,
-  counts_or_tpm = "counts"
+  thread_num = 8
+)
+
+rkpm_dt = ensembl_counts_to_rkpm(
+  transcript_counts_dt,
+  lengths_table_path = PostRNASeqAlign::get_human_ensembl_to_hgnc_entrez_path(),
+  readme_path = "~/scratch/test_readme3.txt",
+  this_script_path = housekeeping::get_script_dir_path(include_file_name = T)
 )
 ```

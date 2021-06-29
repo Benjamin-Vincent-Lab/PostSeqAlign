@@ -5,39 +5,36 @@
 \title{convert_ensembl}
 \usage{
 convert_ensembl(
+  my_dt,
   conversion_table_path = get_human_ensembl_to_hgnc_entrez_path(),
   convert_to_column = "hgnc_symbol",
-  file_name = "converted_counts.tsv",
   gene_biotypes = NULL,
-  input_file_path,
-  method_for_combining_counts = sum,
-  output_dir,
-  this_script_path = "",
+  function_for_combining_counts = sum,
+  readme_path = NULL,
+  this_script_path = NULL,
   thread_num = 1
 )
 }
 \arguments{
+\item{my_dt}{Input data.table with transcript counts. Should have samples by row, first columns should be the sample id with all subsequent columns headers in the Ensembl ENST format (no version). Assumes the first column is the sample_key.}
+
 \item{conversion_table_path}{Table to convert ensembl to other types}
 
 \item{convert_to_column}{If using \code{get_human_ensembl_to_hgnc_entrez_path}, choose from: gene_id, hgnc_symbol, entrez_id or hgnc_entrez (eg, hgnc_symbol|entrez_id; not recommended, gene counts will be used several times when HGNC1|1 & HGNC2|1 map to the same ENST)}
 
 \item{gene_biotypes}{The type of biomaRt gene_biotypes that should be output to the gene level output. Recommend you keep all of them. Many gene signature use lots of different biotypes.  Our bgvlab sigs use 18 types which is 228322/234393 of the ENST and 54367/59453 of the HGNC.}
 
-\item{input_file_path}{String path to input file. File should have samples by row, first columns should be the sample id with all subsequent columns headers in the Ensembl ENST format (no version). Assumes the first column is the sample_key.}
+\item{function_for_combining_counts}{Name of function to use to combine the genes. FWIW Joel Parker recommends that transcript colunt columns should be added to get gene level counts and microarrays should be averaged.}
 
-\item{output_dir}{Path to the output folder.}
+\item{readme_path}{Optional path to which the comments will be appended.}
 
 \item{this_script_path}{Path to script that runs this function for documentation purposes}
-
-\item{file_prefix}{Output file will have this prefix string appended to it.}
-
-\item{function_for_combining_counts}{Name of function to use to combine the genes. FWIW Joel Parker recommends that transcript colunt columns should be added to get gene level counts and microarrays should be averaged.}
 }
 \value{
-A vector of paths to the output file.
+Returns a data.table with isoforms converted to genes.
 }
 \description{
-Converts an Ensemble matrix into other gene types using a conversion table
+Converts an Ensemble data.table into other gene types using a conversion table
 }
 \details{
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

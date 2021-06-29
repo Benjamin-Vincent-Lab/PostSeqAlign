@@ -5,21 +5,18 @@
 \title{ensembl_counts_to_rkpm}
 \usage{
 ensembl_counts_to_rkpm(
+  my_dt,
   lengths_table_path = get_human_ensembl_to_hgnc_entrez_path(),
-  file_prefix = "",
-  input_file_path,
-  output_dir,
+  readme_path = NULL,
   this_script_path = ""
 )
 }
 \arguments{
+\item{my_dt}{data.table with samples by row, first column should be the sample id with all subsequent columns headers in the Ensembl ENST format (no version).}
+
 \item{lengths_table_path}{Path to table for with cdna_length and transcript_id columns.}
 
-\item{file_prefix}{Output file will have this prefix string appended to it.}
-
-\item{input_file_path}{String path to input file. File should have samples by row, first columns should be the sample id with all subsequent columns headers in the Ensembl ENST format (no version).}
-
-\item{output_dir}{Path to the output folder.}
+\item{readme_path}{Optional path to which the comments will be appended.}
 
 \item{this_script_path}{Path to script that runs this function for documentation purposes}
 }

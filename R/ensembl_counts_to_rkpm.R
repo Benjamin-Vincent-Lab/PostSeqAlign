@@ -10,51 +10,43 @@
 #' your calculation then you loose all the non-coding transcripts.  If you use 
 #' the full transcript length then you should account for the number of full and 
 #' cds sequences which there's no way to know...</rant>
-#' @param file_prefix Output file will have this prefix string appended to it.
-#' @param input_file_path String path to input file. File should have samples by row, first columns should be the sample id with all subsequent columns headers in the Ensembl ENST format (no version).
+#' @param my_dt data.table with samples by row, first column should be the sample id with all subsequent columns headers in the Ensembl ENST format (no version).
 #' @param lengths_table_path Path to table for with cdna_length and transcript_id columns.
-#' @param output_dir Path to the output folder.
+#' @param readme_path Optional path to which the comments will be appended.
 #' @param this_script_path Path to script that runs this function for documentation purposes
 #' @return A vector of paths to the output file.
 #' 
 #' @export
 ensembl_counts_to_rkpm = function(
+  my_dt,
   lengths_table_path = get_human_ensembl_to_hgnc_entrez_path(),
-  file_prefix = "",
-  input_file_path,
-  output_dir,
+  readme_path = NULL,
   this_script_path = ''
 ){
-  library(binfotron)
   library(magrittr)
   library(data.table)
   library(matrixStats)
   
-  dir.create(output_dir, showWarnings = F)
+  text_output = c()
   
-  if(file_prefix != ""){
-    file_prefix %<>% paste0("__")
-  } else if (grepl("__trans_counts.tsv$", basename(input_file_path))){
-    file_prefix = gsub("trans_counts.tsv$", "", basename(input_file_path))
-  }
-  
-  readme_path = file.path(output_dir, paste0(file_prefix,"readme.txt"))
-  if(file.exists(readme_path)){ file.remove(readme_path)}
+  if(!is.null(readme_path) && file.exists(readme_path)) file.remove(readme_path)
   
   a = function(...){
     my_output = paste0(...)
+    assign('text_output', c(text_output, my_output), env = parent.frame())
     if(!is.null(readme_path)){
       write(my_output, readme_path, append = TRUE)
     }
     cat(paste0(my_output,"\n"))
   }
   
+  a("Running ensembl_counts_to_rkpm")
+  if(!is.null(this_script_path)) a("script: ", this_script_path)
   a("")
   
   # convert to a data table according to the names of the list 
   #   (ie, use.names = T won't assume the genes are in the same order)
-  dat = fread(input_file_path)
-  sample_key = names(dat)[1]
+  sample_key = names(my_dt)[1]
   
   lengths_df = fread(lengths_table_path, data.table = F, select = c("transcript_id","cdna_length"))
   
@@ -67,7 +59,7 @@ ensembl_counts_to_rkpm = function(
   names(transcript_length_per_k_lut) = lengths_df$transcript_id
   rm(lengths_df)
   
-  dat = dat[,c(sample_key, names(transcript_length_per_k_lut)), with = F]
+  my_dt = my_dt[,c(sample_key, names(transcript_length_per_k_lut)), with = F]
   
   # tried geting sample totals with data.frame operation but it was slower
   # sub_dat = dat[, 1:40000]
@@ -79,22 +71,22 @@ ensembl_counts_to_rkpm = function(
   # use () around it to have data.table check the var name
   
   a("Calculating sample totals.")
-  dat[, `:=`(total = rowSums(.SD, na.rm=T)), .SDcols=2:ncol(dat), by=1:nrow(dat)] # 56-60 sec
+  my_dt[, `:=`(total = rowSums(.SD, na.rm=T)), .SDcols=2:ncol(my_dt), by=1:nrow(my_dt)] # 56-60 sec
 
-  total_lut = dat$total/1000000
-  names(total_lut) = dat[[1]]
-  dat[ , total := NULL]
-  # > all(names(transcript_length_per_k_lut) == names(dat)[-1])
+  total_lut = my_dt$total/1000000
+  names(total_lut) = my_dt[[1]]
+  my_dt[ , total := NULL]
+  # > all(names(transcript_length_per_k_lut) == names(my_dt)[-1])
   # [1] TRUE
   # ptm <- proc.time()
   # for (c_index in 2:1000){ # 13 sec for 1000?!?
-  #   dat[[c_index]] = dat[[c_index]]/transcript_length_per_k_lut[c_index]
+  #   my_dt[[c_index]] = my_dt[[c_index]]/transcript_length_per_k_lut[c_index]
   # }
   # proc.time() - ptm
   # mat %*% diag(1/dev),
 
   # https://stackoverflow.com/questions/20596433/how-to-divide-each-row-of-a-matrix-by-elements-of-a-vector-in-r
-  mat = dat[,2:ncol(dat)] %>% as.matrix
+  mat = my_dt[,2:ncol(my_dt)] %>% as.matrix
   ptm <- proc.time()
   # mat = mat %*% diag(1/transcript_length_per_k_lut)
   a("Divide each gene column by its cdna_length/1000")
@@ -104,11 +96,11 @@ ensembl_counts_to_rkpm = function(
   mat = mat/total_lut
   
   proc.time() - ptm
-  dat[,2:ncol(dat)] = data.frame(mat)
+  my_dt[,2:ncol(my_dt)] = data.frame(mat)
   
   
-  output_path = file.path(output_dir, paste0(file_prefix, "trans_rkpm.tsv"))
+  attributes(my_dt)$comments = c(text_output, "") 
   
-  fwrite(dat, output_path, sep = "\t")
+  return(my_dt)
 
 }
