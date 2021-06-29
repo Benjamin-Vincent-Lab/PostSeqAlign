@@ -69,9 +69,10 @@ convert_ensembl = function(
   conversion_df = conversion_df[conversion_df$transcript_id %in% names(my_dt)[-1],]
   
   a(paste0("gene_biotypes: ", paste0(sort(unique(conversion_df$gene_biotype)), collapse = ", ")))
+  a("")
   if(!is.null(gene_biotypes)){
     if(length(gene_biotypes) > 0){
-      a(paste0("* Restricting gene_biotypes to: ", paste0(gene_biotypes, collapse = ", ")))
+      a(paste0("Restricting gene_biotypes to: ", paste0(gene_biotypes, collapse = ", ")))
       conversion_df = conversion_df[conversion_df$gene_biotype %in% gene_biotypes,]
     }
   }
@@ -119,17 +120,18 @@ convert_ensembl = function(
   # proc.time() - ptm
   
   #ptm <- proc.time()
-  my_dt = foreach(my_gene=my_genes, .combine=cbind) %dopar% { # 3x faster than for loop & lapply; 5% faster than mclapply
+  converted_dt = foreach(my_gene=my_genes, .combine=cbind) %dopar% { # 3x faster than for loop & lapply; 5% faster than mclapply
     my_transcripts = unique(conversion_df$transcript_id[conversion_df[[convert_to_column]] == my_gene])
     apply(my_dt[,my_transcripts, with = F],1,function_for_combining_counts)
   }
-  my_dt = cbind(my_dt[,1, drop = FALSE], my_dt)
-  colnames(my_dt) = c(sample_key, my_genes)
+  converted_dt = data.table(Run_ID = my_dt[[1]], converted_dt)
+  
+  names(converted_dt) = c(sample_key, my_genes)
   
   # message("foreach")
   #proc.time() - ptm
   
-  attributes(my_dt)$comments = c(text_output, "") 
+  attributes(converted_dt)$comments = c(text_output, "") 
   
-  return(my_dt)
+  return(converted_dt)
 }
