@@ -58,9 +58,8 @@ ensembl_counts_to_rkpm = function(
   transcript_length_per_k_lut = lengths_df$cdna_length/1000
   names(transcript_length_per_k_lut) = lengths_df$transcript_id
   rm(lengths_df)
-  
-  my_cols = names(transcript_length_per_k_lut) %>% .[. %in% names(my_dt)]
-  my_dt %<>% .[,c(sample_key, my_cols), with = F]
+  transcript_length_per_k_lut %<>% .[names(.) %in% names(my_dt)]
+  my_dt %<>% .[,c(sample_key, names(transcript_length_per_k_lut)), with = F]
   
   # tried geting sample totals with data.frame operation but it was slower
   # sub_dat = dat[, 1:40000]
