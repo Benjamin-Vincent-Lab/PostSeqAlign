@@ -7,7 +7,7 @@ to HGNC and entrez gene ids. cDNA transcript features have also been added.
 Using biomaRt and AnnotationDbi is a pretty awful way to go about converting 
 genes. The resources are slow, lose connections, are down a lot, and have tons 
 of gaps in the data. Contrarily, the GTF file has most of everything we need.  
-To get this information we have to scrap it ourselves (GTF extraction tools 
+To get this information we have to scrape it ourselves (GTF extraction tools 
 won't get it :-/). If we combine that with the grch38 cDNA and we have 
 everything to perfectly map the hgnc to the transcripts and pull out cDNA 
 features. Entrez IDs are less complete. Entrez were better for matching to UCSC 

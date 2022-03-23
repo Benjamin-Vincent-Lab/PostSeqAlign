@@ -12,7 +12,7 @@ devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign")
 
 Or for a specific version:
 ``` r
-devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign", ref = "0.4-10")
+devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign", ref = "0.4-11")
 ```
 
 ## Previous locations

@@ -59,7 +59,8 @@ ensembl_counts_to_rkpm = function(
   names(transcript_length_per_k_lut) = lengths_df$transcript_id
   rm(lengths_df)
   
-  my_dt = my_dt[,c(sample_key, names(transcript_length_per_k_lut)), with = F]
+  my_cols = names(transcript_length_per_k_lut) %>% .[. %in% names(my_dt)]
+  my_dt %<>% .[,c(sample_key, my_cols), with = F]
   
   # tried geting sample totals with data.frame operation but it was slower
   # sub_dat = dat[, 1:40000]
@@ -76,26 +77,17 @@ ensembl_counts_to_rkpm = function(
   total_lut = my_dt$total/1000000
   names(total_lut) = my_dt[[1]]
   my_dt[ , total := NULL]
-  # > all(names(transcript_length_per_k_lut) == names(my_dt)[-1])
-  # [1] TRUE
-  # ptm <- proc.time()
-  # for (c_index in 2:1000){ # 13 sec for 1000?!?
-  #   my_dt[[c_index]] = my_dt[[c_index]]/transcript_length_per_k_lut[c_index]
-  # }
-  # proc.time() - ptm
-  # mat %*% diag(1/dev),
 
   # https://stackoverflow.com/questions/20596433/how-to-divide-each-row-of-a-matrix-by-elements-of-a-vector-in-r
   mat = my_dt[,2:ncol(my_dt)] %>% as.matrix
-  ptm <- proc.time()
-  # mat = mat %*% diag(1/transcript_length_per_k_lut)
+  #ptm <- proc.time()
   a("Divide each gene column by its cdna_length/1000")
   mat = t(t(mat) / transcript_length_per_k_lut)
   
   a("Divide each sample row by its sample_total/1,000,000")
   mat = mat/total_lut
   
-  proc.time() - ptm
+  #proc.time() - ptm
   my_dt[,2:ncol(my_dt)] = data.frame(mat)
   
   

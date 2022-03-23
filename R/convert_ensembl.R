@@ -33,8 +33,7 @@ convert_ensembl = function(
   library(binfotron)
   library(magrittr)
   library(data.table)
-  library(doMC)
-  registerDoMC(thread_num)
+
   
   text_output = c(attributes(my_dt)$comments)
   
@@ -120,6 +119,8 @@ convert_ensembl = function(
   # proc.time() - ptm
   
   #ptm <- proc.time()
+  library(doMC)
+  registerDoMC(thread_num)
   converted_dt = foreach(my_gene=my_genes, .combine=cbind) %dopar% { # 3x faster than for loop & lapply; 5% faster than mclapply
     my_transcripts = unique(conversion_df$transcript_id[conversion_df[[convert_to_column]] == my_gene])
     apply(my_dt[,my_transcripts, with = F],1,function_for_combining_counts)
