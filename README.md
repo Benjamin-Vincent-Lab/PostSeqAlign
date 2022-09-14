@@ -44,13 +44,17 @@ workflows.
 
 ## Recommendations
 * Avoid using RKPM unless you are doing it preparation for other module (eg TIDE).
-* It's better to stick with HGNC instead of Entrez IDs as HGNCs map one-to-one and the Entrez data have a lot of gaps.
+* It's better to stick with HGNC instead of Entrez IDs as HGNCs map one-to-one 
+and the Entrez data have a lot of gaps.
 
 ##ToDos
-Right now the `human_ensembl_to_hgnc_entrez` table was built using a GTF for 
+* Right now the `human_ensembl_to_hgnc_entrez` table was built using a GTF for 
 GRCh38/v103.  If a different GTF is used to map the reads then ideally a new 
 conversion table would be provided for those conversions.
-
+* Make unit tests
+* Conversion tables should only convert 1 to 1 to avoid problems where one 
+column's content could be duplicated if a one-to-many relationship exists in 
+another column
 
 ## Example code
 ``` R

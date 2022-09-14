@@ -2,6 +2,7 @@
 
 export(convert_ensembl)
 export(ensembl_counts_to_rkpm)
+export(ensembl_counts_to_tpm)
 export(get_biomart_grch38_path)
 export(get_biomart_hg38_path)
 export(get_human_ensembl_to_hgnc_entrez_path)

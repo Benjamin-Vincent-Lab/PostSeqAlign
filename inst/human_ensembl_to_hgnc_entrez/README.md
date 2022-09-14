@@ -1,4 +1,5 @@
 human_ensembl_to_hgnc_entrez v0.1-01
+https://sc.unc.edu/benjamin-vincent-lab/gene-sigs/human_ensembl_to_hgnc_entrez
 
 This script was made to make a table that we can use to convert ENST transcripts 
 to HGNC and entrez gene ids. cDNA transcript features have also been added.
