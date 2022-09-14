@@ -2,7 +2,7 @@
 % Please edit documentation in R/ensembl_counts_to_tpm.R
 \name{ensembl_counts_to_tpm}
 \alias{ensembl_counts_to_tpm}
-\title{ensembl_counts_to_rkpm}
+\title{ensembl_counts_to_tpm}
 \usage{
 ensembl_counts_to_tpm(
   my_dt,
@@ -28,6 +28,6 @@ Converts an Ensemble ENST counts matrix into TPM.
 }
 \details{
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ensembl_counts_to_rkpm
+ensembl_counts_to_tpm
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

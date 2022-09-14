@@ -1,8 +1,8 @@
 
 #' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#' ensembl_counts_to_rkpm
+#' ensembl_counts_to_tpm
 #' ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#' @title ensembl_counts_to_rkpm 
+#' @title ensembl_counts_to_tpm 
 #' 
 #' @description 
 #' Converts an Ensemble ENST counts matrix into TPM.
