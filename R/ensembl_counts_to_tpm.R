@@ -68,15 +68,6 @@ ensembl_counts_to_tpm = function(
   rm(lengths_df)
   transcript_length_in_kb_lut %<>% .[names(.) %in% names(my_dt)]
   my_dt %<>% .[,c(sample_key, names(transcript_length_in_kb_lut)), with = F]
-  
-  # tried geting sample totals with data.frame operation but it was slower
-  # sub_dat = dat[, 1:40000]
-  # with 4 cores 40K columns ran in 19 sec instead of 26
-  # with 24 cores all isoforms took 1130 sec
-  # ptm <- proc.time()
-  # sample_totals = dat[, parallel::mclapply(.SD, sum, na.rm=TRUE, mc.cores = thread_num), .SDcols=2:ncol(dat) ] 
-  # proc.time() - ptm
-  # use () around it to have data.table check the var name
  
   # https://stackoverflow.com/questions/20596433/how-to-divide-each-row-of-a-matrix-by-elements-of-a-vector-in-r
   #ptm <- proc.time()
@@ -113,3 +104,27 @@ ensembl_counts_to_tpm = function(
   return(my_dt)
 
 }
+
+# to convince myself this worked as intended
+# devtools::install_github("Benjamin-Vincent-Lab/PostRNASeqAlign", ref = "0.5.1")
+# 
+# orig_dt = data.table::fread('/datastore/nextgenout5/share/labs/Vincent_Lab/tools/raft/shared/tagged_batches/Choueiri_CCR_2016/rna_quant/all_v1/rna_quant__Choueiri_CCR_2016__all__enst_counts.tsv')
+# output_dt = PostRNASeqAlign::ensembl_counts_to_tpm(orig_dt)
+# orig_dt = orig_dt[,names(output_dt), with = F]
+# View(orig_dt[,1:10])
+# View(output_dt[,1:10])
+# 
+# 
+# lengths_table_path = PostRNASeqAlign::get_human_ensembl_to_hgnc_entrez_path()
+# lengths_df = fread(lengths_table_path, data.table = F, select = c("transcript_id","cdna_length"))
+# lengths_df = lengths_df[!is.na(lengths_df$cdna_length), ]
+# lengths_df = lengths_df[lengths_df$cdna_length > 0, ]
+# transcript_length_in_kb_lut = lengths_df$cdna_length/1000
+# names(transcript_length_in_kb_lut) = lengths_df$transcript_id
+# transcript_length_in_kb_lut = transcript_length_in_kb_lut[names(output_dt)[-1]]
+# 
+# row1_counts = unlist(orig_dt[1,2:ncol(orig_dt), with =F])
+# row1_rpk = row1_counts/transcript_length_in_kb_lut
+# row1_summed_rpk = sum(row1_rpk)
+# row1_summed_rpk_per_mil = row1_summed_rpk/1000000
+# r1_tpm = row1_rpk/row1_summed_rpk_per_mil
