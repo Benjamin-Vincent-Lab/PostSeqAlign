@@ -51,7 +51,6 @@ post_process_rnaseq_align = function(
   message("******************************************************************")
   library(binfotron)
   library(magrittr)
-  library(org.Hs.eg.db)
   library(data.table)
   
   dir.create(output_dir, showWarnings = F)
